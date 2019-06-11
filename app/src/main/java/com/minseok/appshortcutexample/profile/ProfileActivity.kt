@@ -16,7 +16,8 @@ class ProfileActivity : ExtendedActivity(), ProfileContract.View {
 
         ProfilePresenter(this)
 
-        mPresenter.getUserInfo("minseok-kr")
+        val userName = intent.getStringExtra("user_name")
+        mPresenter.getUserInfo(userName)
     }
 
     override fun showInfo(user: User) {

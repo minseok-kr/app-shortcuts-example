@@ -2,4 +2,6 @@
     <string name="app_name">appShortcutExample</string>
 
     <string name="txt_data_not_available">데이터를 사용할 수 없습니다.</string>
+    <string name="txt_hint_input_username">유저 이름을 입력하세요</string>
+    <string name="txt_btn_add">추가</string>
 </resources>

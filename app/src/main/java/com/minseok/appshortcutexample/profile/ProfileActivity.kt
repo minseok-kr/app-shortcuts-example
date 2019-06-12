@@ -1,5 +1,6 @@
 package com.minseok.appshortcutexample.profile
 
+import android.content.Intent
 import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.minseok.appshortcutexample.R
@@ -33,6 +34,13 @@ class ProfileActivity : ExtendedActivity(), ProfileContract.View {
 
     override fun onNotAvailData() {
         toast(R.string.txt_data_not_available)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        if (intent?.hasExtra(KEY_USER_NAME) == true) {
+            val user = intent.getStringExtra(KEY_USER_NAME)
+            mPresenter.getUserInfo(user)
+        }
     }
 
     override fun setPresenter(presenter: ProfileContract.Presenter) {

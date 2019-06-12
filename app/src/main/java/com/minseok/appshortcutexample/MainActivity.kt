@@ -2,15 +2,18 @@ package com.minseok.appshortcutexample
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.minseok.appshortcutexample.common.ExtendedActivity
 import com.minseok.appshortcutexample.common.KEY_USER_NAME
+import com.minseok.appshortcutexample.common.ShortcutHelper
 import com.minseok.appshortcutexample.profile.ProfileActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
@@ -18,15 +21,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : ExtendedActivity() {
-    private val TAG = this.javaClass.simpleName
     private lateinit var mAdapter: ProfileAdapter
+    private lateinit var mHelper: ShortcutHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        btn_add.setOnClickListener { addProfile() }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            mHelper = ShortcutHelper(this)
+
+            mHelper.refreshShortcuts(false)
+
             btn_add.setOnClickListener { addProfile() }
+        } else {
+            toast("Shortscut 을 지원하지 않습니다.")
+        }
 
         mAdapter = ProfileAdapter(this)
 
@@ -34,6 +44,7 @@ class MainActivity : ExtendedActivity() {
     }
 
     // 추가하기
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun addProfile() {
         val inputName = edit_name.text.toString()
         if (inputName.isEmpty()) {
@@ -45,8 +56,10 @@ class MainActivity : ExtendedActivity() {
         edit_name.setText("")
     }
 
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun addProfile(userName: String) {
         CoroutineScope(Dispatchers.IO).launch {
+            mHelper.addProfileShortcuts(userName)
 
             CoroutineScope(Dispatchers.Main).launch {
                 mAdapter.add(userName)
@@ -54,8 +67,10 @@ class MainActivity : ExtendedActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun removeProfile(userName: String) {
         CoroutineScope(Dispatchers.IO).launch {
+            mHelper.removeProfileShortcuts(userName)
 
             CoroutineScope(Dispatchers.Main).launch {
                 mAdapter.remove(userName)
@@ -81,7 +96,9 @@ class MainActivity : ExtendedActivity() {
                 }
 
                 this.findViewById<ImageButton>(R.id.btn_remove).setOnClickListener {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
                         removeProfile(name)
+                    }
                 }
             }
         }

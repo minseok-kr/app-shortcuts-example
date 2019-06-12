@@ -4,6 +4,7 @@ import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.minseok.appshortcutexample.R
 import com.minseok.appshortcutexample.common.ExtendedActivity
+import com.minseok.appshortcutexample.common.KEY_USER_NAME
 import com.minseok.appshortcutexample.model.User
 import kotlinx.android.synthetic.main.activity_profile.*
 
@@ -16,7 +17,7 @@ class ProfileActivity : ExtendedActivity(), ProfileContract.View {
 
         ProfilePresenter(this)
 
-        val userName = intent.getStringExtra("user_name")
+        val userName = intent.getStringExtra(KEY_USER_NAME)
         mPresenter.getUserInfo(userName)
     }
 

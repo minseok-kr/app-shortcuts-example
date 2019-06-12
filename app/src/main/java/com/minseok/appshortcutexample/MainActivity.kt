@@ -6,11 +6,16 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.minseok.appshortcutexample.common.ExtendedActivity
+import com.minseok.appshortcutexample.common.KEY_USER_NAME
 import com.minseok.appshortcutexample.profile.ProfileActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ExtendedActivity() {
     private val TAG = this.javaClass.simpleName
@@ -21,6 +26,7 @@ class MainActivity : ExtendedActivity() {
         setContentView(R.layout.activity_main)
 
         btn_add.setOnClickListener { addProfile() }
+            btn_add.setOnClickListener { addProfile() }
 
         mAdapter = ProfileAdapter(this)
 
@@ -34,8 +40,27 @@ class MainActivity : ExtendedActivity() {
             return
         }
 
-        mAdapter.add(inputName)
+        addProfile(inputName)
+
         edit_name.setText("")
+    }
+
+    private fun addProfile(userName: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            CoroutineScope(Dispatchers.Main).launch {
+                mAdapter.add(userName)
+            }
+        }
+    }
+
+    private fun removeProfile(userName: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            CoroutineScope(Dispatchers.Main).launch {
+                mAdapter.remove(userName)
+            }
+        }
     }
 
     inner class ProfileAdapter(private val context: Context) : BaseAdapter() {
@@ -51,8 +76,12 @@ class MainActivity : ExtendedActivity() {
 
                 this.setOnClickListener {
                     Intent(this@MainActivity, ProfileActivity::class.java).apply {
-                        this.putExtra("user_name", name)
+                        this.putExtra(KEY_USER_NAME, name)
                     }.also { startActivity(it) }
+                }
+
+                this.findViewById<ImageButton>(R.id.btn_remove).setOnClickListener {
+                        removeProfile(name)
                 }
             }
         }
@@ -65,6 +94,11 @@ class MainActivity : ExtendedActivity() {
 
         fun add(userName: String) {
             mData.add(userName)
+            notifyDataSetChanged()
+        }
+
+        fun remove(userName: String) {
+            mData.remove(userName)
             notifyDataSetChanged()
         }
     }
